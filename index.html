@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>ComfyUI</title>
+    <title>Nordy Preview</title>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no"
@@ -10,6 +10,17 @@
     <link rel="stylesheet" type="text/css" href="user.css" />
     <link rel="stylesheet" type="text/css" href="materialdesignicons.min.css" />
   </head>
+  <script type="module">
+    window.console.log = () => {
+      return null
+    }
+    window.console.error = () => {
+      return null
+    }
+    window.console.warn = () => {
+      return null
+    }
+  </script>
   <body class="litegraph grid">
     <div id="vue-app"></div>
     <script type="module" src="src/main.ts"></script>

@@ -1,27 +1,12 @@
 <template>
   <teleport to=".graph-canvas-container">
-    <!-- <LiteGraphCanvasSplitterOverlay v-if="betaMenuEnabled">
-      <template #side-bar-panel>
-        <SideToolbar />
-      </template>
-      <template #bottom-panel>
-        <BottomPanel />
-      </template>
-      <template #graph-canvas-panel>
-        <GraphCanvasMenu v-if="canvasMenuEnabled" />
-      </template>
-    </LiteGraphCanvasSplitterOverlay>
-    <TitleEditor />
-    <GraphCanvasMenu v-if="!betaMenuEnabled && canvasMenuEnabled" /> -->
     <canvas ref="canvasRef" id="graph-canvas" tabindex="1" />
   </teleport>
-  <NodeSearchboxPopover />
   <NodeTooltip v-if="tooltipEnabled" />
   <NodeBadge />
 </template>
 
 <script setup lang="ts">
-import NodeSearchboxPopover from '@/components/searchbox/NodeSearchBoxPopover.vue'
 import NodeTooltip from '@/components/graph/NodeTooltip.vue'
 import NodeBadge from '@/components/graph/NodeBadge.vue'
 import { ref, computed, onMounted, watchEffect } from 'vue'
