@@ -1,6 +1,6 @@
 <template>
   <teleport to=".graph-canvas-container">
-    <LiteGraphCanvasSplitterOverlay v-if="betaMenuEnabled">
+    <!-- <LiteGraphCanvasSplitterOverlay v-if="betaMenuEnabled">
       <template #side-bar-panel>
         <SideToolbar />
       </template>
@@ -12,7 +12,7 @@
       </template>
     </LiteGraphCanvasSplitterOverlay>
     <TitleEditor />
-    <GraphCanvasMenu v-if="!betaMenuEnabled && canvasMenuEnabled" />
+    <GraphCanvasMenu v-if="!betaMenuEnabled && canvasMenuEnabled" /> -->
     <canvas ref="canvasRef" id="graph-canvas" tabindex="1" />
   </teleport>
   <NodeSearchboxPopover />
@@ -21,10 +21,6 @@
 </template>
 
 <script setup lang="ts">
-import TitleEditor from '@/components/graph/TitleEditor.vue'
-import SideToolbar from '@/components/sidebar/SideToolbar.vue'
-import BottomPanel from '@/components/bottomPanel/BottomPanel.vue'
-import LiteGraphCanvasSplitterOverlay from '@/components/LiteGraphCanvasSplitterOverlay.vue'
 import NodeSearchboxPopover from '@/components/searchbox/NodeSearchBoxPopover.vue'
 import NodeTooltip from '@/components/graph/NodeTooltip.vue'
 import NodeBadge from '@/components/graph/NodeBadge.vue'
@@ -51,7 +47,6 @@ import {
   ModelNodeProvider,
   useModelToNodeStore
 } from '@/stores/modelToNodeStore'
-import GraphCanvasMenu from '@/components/graph/GraphCanvasMenu.vue'
 import { usePragmaticDroppable } from '@/hooks/dndHooks'
 
 const emit = defineEmits(['ready'])

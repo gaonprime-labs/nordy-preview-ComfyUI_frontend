@@ -57,6 +57,7 @@ import { useExtensionStore } from '@/stores/extensionStore'
 import { KeyComboImpl, useKeybindingStore } from '@/stores/keybindingStore'
 import { useCommandStore } from '@/stores/commandStore'
 import { shallowReactive } from 'vue'
+import { adjustGraphToFitInCanvas } from '@/utils/adjustGraphToFitInCanvas'
 
 export const ANIM_PREVIEW_WIDGET = '$$comfy_animation_preview'
 
@@ -1826,22 +1827,22 @@ export class ComfyApp {
    */
   async setup(canvasEl: HTMLCanvasElement) {
     this.canvasEl = canvasEl
-    await this.#setUser()
+    // await this.#setUser()
 
     this.resizeCanvas()
 
-    await Promise.all([
-      this.workflowManager.loadWorkflows(),
-      this.ui.settings.load()
-    ])
+    // await Promise.all([
+    //   this.workflowManager.loadWorkflows(),
+    //   this.ui.settings.load()
+    // ])
     await this.#loadExtensions()
 
-    addDomClippingSetting()
-    this.#addProcessMouseHandler()
-    this.#addProcessKeyHandler()
-    this.#addConfigureHandler()
-    this.#addApiUpdateHandlers()
-    this.#addRestoreWorkflowView()
+    // addDomClippingSetting()
+    // this.#addProcessMouseHandler()
+    // this.#addProcessKeyHandler()
+    // this.#addConfigureHandler()
+    // this.#addApiUpdateHandlers()
+    // this.#addRestoreWorkflowView()
 
     this.graph = new LGraph()
 
@@ -1872,49 +1873,87 @@ export class ComfyApp {
     initWidgets(this)
 
     // Load previous workflow
-    let restored = false
-    try {
-      const loadWorkflow = async (json) => {
-        if (json) {
-          const workflow = JSON.parse(json)
-          const workflowName = getStorageValue('Comfy.PreviousWorkflow')
-          await this.loadGraphData(workflow, true, true, workflowName)
-          return true
-        }
-      }
-      const clientId = api.initialClientId ?? api.clientId
-      restored =
-        (clientId &&
-          (await loadWorkflow(
-            sessionStorage.getItem(`workflow:${clientId}`)
-          ))) ||
-        (await loadWorkflow(localStorage.getItem('workflow')))
-    } catch (err) {
-      console.error('Error loading previous workflow', err)
-    }
+    // let restored = false
+    // try {
+    //   const loadWorkflow = async (json) => {
+    //     if (json) {
+    //       const workflow = JSON.parse(json)
+    //       const workflowName = getStorageValue('Comfy.PreviousWorkflow')
+    //       await this.loadGraphData(workflow, true, true, workflowName)
+    //       return true
+    //     }
+    //   }
+    //   const clientId = api.initialClientId ?? api.clientId
+    //   restored =
+    //     (clientId &&
+    //       (await loadWorkflow(
+    //         sessionStorage.getItem(`workflow:${clientId}`)
+    //       ))) ||
+    //     (await loadWorkflow(localStorage.getItem('workflow')))
+    // } catch (err) {
+    //   console.error('Error loading previous workflow', err)
+    // }
 
     // We failed to restore a workflow so load the default
-    if (!restored) {
-      await this.loadGraphData()
-    }
+    // if (!restored) {
+    //   await this.loadGraphData()
+    // }
 
     // Save current workflow automatically
-    setInterval(() => {
-      const workflow = JSON.stringify(this.serializeGraph())
-      localStorage.setItem('workflow', workflow)
-      if (api.clientId) {
-        sessionStorage.setItem(`workflow:${api.clientId}`, workflow)
-      }
-    }, 1000)
+    // setInterval(() => {
+    //   const workflow = JSON.stringify(this.serializeGraph())
+    //   localStorage.setItem('workflow', workflow)
+    //   if (api.clientId) {
+    //     sessionStorage.setItem(`workflow:${api.clientId}`, workflow)
+    //   }
+    // }, 1000)
 
     this.#addDrawNodeHandler()
     this.#addDrawGroupsHandler()
-    this.#addDropHandler()
-    this.#addCopyHandler()
-    this.#addPasteHandler()
-    this.#addWidgetLinkHandling()
+    // this.#addDropHandler()
+    // this.#addCopyHandler()
+    // this.#addPasteHandler()
+    // this.#addWidgetLinkHandling()
 
     await this.#invokeExtensionsAsync('setup')
+
+    // 모든 이벤트 리스너 제거 함수
+    function removeAllListeners(canvas) {
+      // `canvas`에 연결된 기본 이벤트들을 비웁니다
+      canvas.ondrop = null
+      canvas.ondragover = null
+      canvas.onclick = null
+      canvas.onmousedown = null
+      canvas.onmouseup = null
+      canvas.onmousemove = null
+      canvas.onwheel = null
+
+      console.log('All event listeners removed from canvas')
+    }
+
+    removeAllListeners(this.canvasEl)
+
+    window.parent.postMessage({ type: 'comfy-preveiw-app-ready' }, '*')
+
+    window.addEventListener('message', async (event) => {
+      if (event.data.type === 'nordy-workflow-request') {
+        this.canvas.read_only = true
+
+        console.log(`event.data.workflow :`, event.data.workflow)
+
+        const bodyElements = Array.from(document.body.children)
+        bodyElements.forEach((element) => {
+          if (!element.classList.contains('graph-canvas-container')) {
+            element.remove()
+          }
+        })
+
+        await this.loadGraphData(event.data.workflow, true)
+        adjustGraphToFitInCanvas(this)
+
+        window.parent.postMessage({ type: 'comfy-preveiw-graph-ready' }, '*')
+      }
+    })
   }
 
   resizeCanvas() {
