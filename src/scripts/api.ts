@@ -322,6 +322,8 @@ class ComfyApi extends EventTarget {
       workflow
     }: { output: Record<number, any>; workflow: ComfyWorkflowJSON }
   ): Promise<PromptResponse> {
+    throw new Error('queuePrompt is not implemented')
+
     const body: QueuePromptRequestBody = {
       client_id: this.clientId ?? '', // TODO: Unify clientId access
       prompt: output,

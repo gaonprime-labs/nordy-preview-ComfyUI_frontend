@@ -1933,6 +1933,13 @@ export class ComfyApp {
 
     removeAllListeners(this.canvasEl)
 
+    const bodyElements = Array.from(document.body.children)
+    bodyElements.forEach((element) => {
+      if (!element.classList.contains('graph-canvas-container')) {
+        element.remove()
+      }
+    })
+
     window.parent.postMessage({ type: 'comfy-preveiw-app-ready' }, '*')
 
     window.addEventListener('message', async (event) => {
@@ -1940,13 +1947,6 @@ export class ComfyApp {
         this.canvas.read_only = true
 
         console.log(`event.data.workflow :`, event.data.workflow)
-
-        const bodyElements = Array.from(document.body.children)
-        bodyElements.forEach((element) => {
-          if (!element.classList.contains('graph-canvas-container')) {
-            element.remove()
-          }
-        })
 
         await this.loadGraphData(event.data.workflow, true)
         adjustGraphToFitInCanvas(this)
